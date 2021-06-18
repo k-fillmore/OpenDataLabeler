@@ -9,17 +9,31 @@ function App() {
       <div className="App">
         <BootstrapNavbar></BootstrapNavbar>
       </div>
+      {/* Primary Router */}
       <Router>
         <Switch>
           <Route path="/Home">
             <div>home</div>
           </Route>
-          <Route path="/Datasets">
+          <Route path="Datasets/View">
             <div>datasets</div>
           </Route>
           <Route path="/QuickLabeler">
             <div>QuickLabeler</div>
           </Route>
+
+          {/* Dataset Router */}
+          <Router basename="Datasets">
+            <Switch>
+              <Route path="View">
+                <div>View</div>
+              </Route>
+              <Route path="Create">
+                <div>Create</div>
+              </Route>
+            </Switch>
+          </Router>
+
         </Switch>
       </Router>
     </>
