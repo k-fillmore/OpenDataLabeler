@@ -2,6 +2,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import BootstrapNavbar from "./components/BootstrapNavbar";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import DatasetCreate from "./components/DatasetCreate";
 
 function App() {
   return (
@@ -25,11 +26,11 @@ function App() {
           {/* Dataset Router */}
           <Router basename="Datasets">
             <Switch>
-              <Route path="View">
+              <Route path="/View">
                 <div>View</div>
               </Route>
-              <Route path="Create">
-                <div>Create</div>
+              <Route path="/Create">
+                <DatasetCreate></DatasetCreate>
               </Route>
             </Switch>
           </Router>
