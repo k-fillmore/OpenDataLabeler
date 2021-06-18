@@ -8,11 +8,11 @@ export default function BootstrapNavbar() {
   return (
     <>
     <Navbar bg="dark" variant="dark">
-    <Navbar.Brand href="#home">Navbar</Navbar.Brand>
+    <Navbar.Brand href="Home">Navbar</Navbar.Brand>
     <Nav className="mr-auto">
-      <Nav.Link href="#home">Home</Nav.Link>
-      <Nav.Link href="#Datasets">Datasets</Nav.Link>
-      <Nav.Link href="#QuickLabeler">Quick Labeler</Nav.Link>
+      <Nav.Link href="Home">Home</Nav.Link>
+      <Nav.Link href="Datasets">Datasets</Nav.Link>
+      <Nav.Link href="QuickLabeler">Quick Labeler</Nav.Link>
     </Nav>
   </Navbar>
     </>
