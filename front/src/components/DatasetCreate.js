@@ -57,8 +57,13 @@ function DatasetCreate() {
     return (
       <>
         <InputGroup className="mb-3">
+        <InputGroup.Prepend>
+          <InputGroup.Text id="basic-addon1" value={datasetName}>
+          Dataset Type:
+          </InputGroup.Text>
+        </InputGroup.Prepend>
           <ButtonGroup toggle>
-            Dataset Type:
+            
             {buttonArray.map((type, idx) => (
               <ToggleButton
                 variant="dark"
@@ -82,8 +87,13 @@ function DatasetCreate() {
     return (
       <>
         <InputGroup className="mb-3">
+        <InputGroup.Prepend>
+          <InputGroup.Text id="basic-addon1" value={datasetName}>
+          Problem Type:
+          </InputGroup.Text>
+        </InputGroup.Prepend>
           <ButtonGroup toggle>
-            Problem Type:
+            
             {buttonArray.map((type, idx) => (
               <ToggleButton
                 key={idx}
