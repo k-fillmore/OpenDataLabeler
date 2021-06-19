@@ -1,0 +1,21 @@
+.Dropzone {
+  border: 1px solid lightgray;
+  background: lightgray;
+  border-radius: 10px;
+  text-align: center;
+  align-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  height: 100px;
+  box-shadow:  1px 1px 20px lightgray;
+}
+.Dropzone .DropzoneText {
+  text-align: center;
+  vertical-align: middle;
+  line-height: 100px;
+  font-family:Raleway;
+  font-size: 25px;
+  font-weight: 500;
+  height: 100px;
+}
