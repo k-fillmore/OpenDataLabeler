@@ -30,7 +30,9 @@ function App() {
                 <div>View</div>
               </Route>
               <Route path="/Create">
+                <div className="PrimaryComponent">
                 <DatasetCreate></DatasetCreate>
+                </div>
               </Route>
             </Switch>
           </Router>

@@ -8,6 +8,7 @@ import {
 } from "react-bootstrap";
 import Dropzone from "./Dropzone";
 import { v4 as uuid } from "uuid";
+import "./DatasetCreate.css"
 
 function DatasetCreate() {
   const [datasetId, setDatasetId] = useState(uuid());
@@ -66,10 +67,11 @@ function DatasetCreate() {
             
             {buttonArray.map((type, idx) => (
               <ToggleButton
+                className="DatasetSelectors"
                 variant="dark"
                 key={idx}
                 type="radio"
-                variant="secondary"
+                variant="outline-dark"
                 name="radio"
                 value={type.name}
                 checked={datasetType === type.value}
@@ -86,19 +88,23 @@ function DatasetCreate() {
   function generateSubtypeButtons(buttonArray) {
     return (
       <>
-        <InputGroup className="mb-3">
+      <div className="DatasetSelectors">
+        <InputGroup className="mb-3 ">
         <InputGroup.Prepend>
           <InputGroup.Text id="basic-addon1" value={datasetName}>
           Problem Type:
           </InputGroup.Text>
         </InputGroup.Prepend>
+          
           <ButtonGroup toggle>
             
             {buttonArray.map((type, idx) => (
+
               <ToggleButton
+                
                 key={idx}
                 type="radio"
-                variant="secondary"
+                variant="outline-dark"
                 name="radio"
                 value={type.value}
                 checked={datasetSubtype === type.value}
@@ -109,12 +115,13 @@ function DatasetCreate() {
             ))}
           </ButtonGroup>
         </InputGroup>
+        </div>
       </>
     );
   }
 
   return (
-    <div>
+    <div className="DatasetCreate">
       <div>Dataset ID: {datasetId}</div>
       <InputGroup className="mb-3">
         <InputGroup.Prepend>
@@ -132,9 +139,9 @@ function DatasetCreate() {
       </InputGroup>
       <div>{generateDatasetButtons(datasetTypes)}</div>
       <div>{displayDatasetTypes()}</div>
-      <div><Dropzone></Dropzone></div>
-      <div>
-        <Button variant="dark">Create</Button>
+      <div className="DatasetCreate"><Dropzone></Dropzone></div>
+      <div className="DatasetCreate centered">
+        <Button  variant="dark">Create</Button>
       </div>
     </div>
   );
