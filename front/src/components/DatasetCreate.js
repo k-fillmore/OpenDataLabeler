@@ -67,7 +67,7 @@ function DatasetCreate() {
             
             {buttonArray.map((type, idx) => (
               <ToggleButton
-                className="DatasetSelectors"
+                
                 variant="dark"
                 key={idx}
                 type="radio"
@@ -88,7 +88,7 @@ function DatasetCreate() {
   function generateSubtypeButtons(buttonArray) {
     return (
       <>
-      <div className="DatasetSelectors">
+      <div>
         <InputGroup className="mb-3 ">
         <InputGroup.Prepend>
           <InputGroup.Text id="basic-addon1" value={datasetName}>
@@ -101,7 +101,7 @@ function DatasetCreate() {
             {buttonArray.map((type, idx) => (
 
               <ToggleButton
-                
+              
                 key={idx}
                 type="radio"
                 variant="outline-dark"
