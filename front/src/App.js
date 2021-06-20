@@ -3,6 +3,7 @@ import "./App.css";
 import BootstrapNavbar from "./components/BootstrapNavbar";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import DatasetCreate from "./components/DatasetCreate";
+import DatasetView from "./components/DatasetView"
 
 function App() {
   return (
@@ -32,6 +33,11 @@ function App() {
               <Route path="/Create">
                 <div className="PrimaryComponent">
                 <DatasetCreate></DatasetCreate>
+                </div>
+              </Route>
+              <Route path="/DetailedView">
+                <div className="PrimaryComponent">
+                <DatasetView></DatasetView>
                 </div>
               </Route>
             </Switch>
