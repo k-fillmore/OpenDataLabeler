@@ -10,7 +10,6 @@ export default function BootstrapNavbar() {
       <Navbar bg="dark" variant="dark">
         <Navbar.Brand href="Home">Open Data Labeler</Navbar.Brand>
         <Nav className="mr-auto">
-          <Nav.Link href="#Home">Home</Nav.Link>
           <NavDropdown title="Datasets" id="collasible-nav-dropdown">
             <NavDropdown.Item href="/Datasets/View">View Datasets </NavDropdown.Item>
             <NavDropdown.Item href="/Datasets/Create">Create Dataset</NavDropdown.Item>
