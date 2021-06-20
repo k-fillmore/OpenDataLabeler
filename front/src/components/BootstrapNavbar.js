@@ -14,6 +14,11 @@ export default function BootstrapNavbar() {
             <NavDropdown.Item href="/Datasets/View">View Datasets </NavDropdown.Item>
             <NavDropdown.Item href="/Datasets/Create">Create Dataset</NavDropdown.Item>
           </NavDropdown>
+          <NavDropdown title="Development" id="collasible-nav-dropdown">
+            <NavDropdown.Item href="/Datasets/View">View Datasets </NavDropdown.Item>
+            <NavDropdown.Item href="/Datasets/Create">Create Dataset</NavDropdown.Item>
+            <NavDropdown.Item href="/Datasets/DetailedView">Dataset Detailed View</NavDropdown.Item>
+          </NavDropdown>
           <Nav.Link href="#QuickLabeler">Quick Labeler</Nav.Link>
         </Nav>
       </Navbar>
