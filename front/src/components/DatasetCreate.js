@@ -15,6 +15,7 @@ function DatasetCreate() {
   const [datasetName, setDatasetName] = useState("");
   const [datasetType, setDatasetType] = useState("Image");
   const [datasetSubtype, setDatasetSubtype] = useState("Classification");
+  //TODO extract zip file to array or send zip to back end? 
   const [datasetItems, setDatasetItems] = useState([
     { path: "test123.img", label: "Yes" },
   ]);
@@ -54,6 +55,8 @@ function DatasetCreate() {
     }
   }
   // function to generate group of radio buttons
+
+  //TODO refactor these into components 
   function generateDatasetButtons(buttonArray) {
     return (
       <>
