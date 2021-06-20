@@ -1,0 +1,11 @@
+.DatasetDetails
+{
+    border-top: 3px solid lightgray;
+    border-radius: 5px;
+    width: 20%;
+}
+.DatasetDetails div{
+    border-bottom: 3px solid lightgray;
+    margin: 5px; 
+    width: 100%;
+}
