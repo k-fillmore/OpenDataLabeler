@@ -4,6 +4,7 @@ import BootstrapNavbar from "./components/BootstrapNavbar";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import DatasetCreate from "./components/DatasetCreate";
 import DatasetView from "./components/DatasetView"
+import DatasetList from "./components/DatasetList";
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
           <Router basename="Datasets">
             <Switch>
               <Route path="/View">
-                <div>View</div>
+                <DatasetList></DatasetList>
               </Route>
               <Route path="/Create">
                 <div className="PrimaryComponent">
