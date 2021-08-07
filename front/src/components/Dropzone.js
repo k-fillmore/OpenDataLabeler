@@ -1,21 +1,33 @@
 import React, { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import "./Dropzone.css";
+import request from 'superagent';
 
-function Dropzone() {
+
+
+function Dropzone(props) {
+  const datasetName = props.datasetName;
+  
+    
   const onDrop = useCallback((acceptedFiles) => {
-    // Do something with the files
+    console.log(datasetName);
+    const res = request.post('http://localhost:8000/api/upload/images/'+"?datasetName="+datasetName)
+    acceptedFiles.forEach((file) => {
+      res.attach("images", file).then(res => {console.log("meep")});
+      
+    });
+    
   }, []);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const {getRootProps, getInputProps, isDragActive} = useDropzone({onDrop} );
 
   return (
     <div className="Dropzone">
       <div {...getRootProps()}>
-        <input {...getInputProps()} />
+        <input {...getInputProps()}/>
         {isDragActive ? (
           <p className="DropzoneText">Drop the files here ...</p>
         ) : (
-          <p className="DropzoneText">Drag 'n' drop some files here, or click to select files</p>
+          <p className="DropzoneText">Drop Files Here or Click Here</p>
         )}
       </div>
     </div>
