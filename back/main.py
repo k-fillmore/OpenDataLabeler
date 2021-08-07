@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
@@ -86,3 +86,108 @@ async def get_all_datasets():
                 properties = json.load(f)
                 datasets.append(properties)
     return datasets
+
+@app.get("/api/dataset/")
+async def get_dataset(dataset_id: str):
+    datasets = []
+    for dataset in os.listdir("./datasets/"):
+        if dataset == "temp":
+            continue
+        if os.path.isdir("./datasets/"+dataset):
+            with open("./datasets/"+dataset+"/properties.json", "r") as f:
+                properties = json.load(f)
+                if properties["id"] == dataset_id:
+                    datasets.append(properties)
+    return datasets
+
+@app.get("/api/dataset/fetchExample")
+async def get_dataset_example(dataset_id: str):
+    ds = get_dataset(dataset_id)
+    if len(ds) == 0:
+        return {"message": "No dataset found"}
+    dataset = ds[0]
+    data_path = dataset["data_path"]
+    files = os.listdir(data_path+"original/")
+    return FileResponse(files[0], filename=files[0])
+
+@app.post("/api/dataset/moveExample")
+async def get_dataset_example(dataset_id: str, file: str, type: str):
+    ds = get_dataset(dataset_id)
+    if len(ds) == 0:
+        return {"message": "No dataset found"}
+    dataset = ds[0]
+    data_path = dataset["data_path"]
+    if type == "train":
+        shutil.move(data_path+"original/"+file, data_path+"train/"+file)
+        return {"message": "Moved to train"}
+    elif type == "valid":
+        shutil.move(data_path+"original/"+file, data_path+"valid/"+file)
+        return {"message": "Moved to valid"}
+    elif type == "test":
+        shutil.move(data_path+"original/"+file, data_path+"test/"+file)
+        return {"message": "Moved to test"}
+    else:
+        return {"message": "Invalid type"}
+
+@app.post("/api/dataset/moveIncorrectExample")
+async def get_dataset_example(dataset_id: str, file: str, src: str, dest: str):
+    ds = get_dataset(dataset_id)
+    if len(ds) == 0:
+        return {"message": "No dataset found"}
+    dataset = ds[0]
+    data_path = dataset["data_path"]
+    if src == "train":
+        shutil.move(data_path+"train/"+file, data_path+dest+"/"+file)
+        return {"message": "Moved to {dest}"}
+    elif src == "valid":
+        shutil.move(data_path+"valid/"+file, data_path+dest+"/"+file)
+        return {"message": "Moved to {dest}"}
+    elif src == "test":
+        shutil.move(data_path+"test/"+file, data_path+dest+"/"+file)
+        return {"message": "Moved to {dest}"}
+    else:
+        return {"message": "Invalid type"}
+
+@app.post("/api/dataset/label/add")
+async def add_dataset_labels(dataset_id: str, label:str):
+    ds = get_dataset(dataset_id)
+    if len(ds) == 0:
+        return {"message": "No dataset found"}
+    dataset = ds[0]
+    if "label" in ds.keys():
+        ds["label"].append(label)
+    else:
+        ds["label"] = [label]
+    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+        json.dump(ds, f)
+    return {"message": "Label added"}
+
+@app.post("/api/dataset/label/delete")
+async def delete_dataset_labels(dataset_id: str, label:str):
+    ds = get_dataset(dataset_id)
+    if len(ds) == 0:
+        return {"message": "No dataset found"}
+    dataset = ds[0]
+    if "label" in ds.keys():
+        ds["label"].remove(label)
+    else:
+        return {"message": "No labels found"}
+    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+        json.dump(ds, f)
+    return {"message": "Label deleted"}
+
+@app.post("/api/dataset/label/rename")
+async def rename_dataset_labels(dataset_id: str, old_label:str, new_label:str):
+    ds = get_dataset(dataset_id)
+    if len(ds) == 0:
+        return {"message": "No dataset found"}
+    dataset = ds[0]
+    if "label" in ds.keys():
+        for i, label in enumerate(ds["label"]):
+            if label == old_label:
+                ds["label"][i] = new_label
+    else:
+        return {"message": "No labels found"}
+    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+        json.dump(ds, f)
+    return {"message": "Label renamed"}
