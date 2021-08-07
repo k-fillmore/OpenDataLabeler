@@ -1,4 +1,5 @@
-from fastapi import FastAPI, UploadFile, File, FileResponse
+from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
@@ -101,14 +102,24 @@ async def get_dataset(dataset_id: str):
     return datasets
 
 @app.get("/api/dataset/fetchExample")
-async def get_dataset_example(dataset_id: str):
-    ds = get_dataset(dataset_id)
-    if len(ds) == 0:
-        return {"message": "No dataset found"}
-    dataset = ds[0]
+async def get_dataset_example(file:str):
+    return FileResponse(file, file_name=file)
+
+@app.get("/api/dataset/listdirectory")
+async def get_dataset_list_directory(dataset_id: str, directory: str):
+    datasets = []
+    for dataset in os.listdir("./datasets/"):
+        if dataset == "temp":
+            continue
+        if os.path.isdir("./datasets/"+dataset):
+            with open("./datasets/"+dataset+"/properties.json", "r") as f:
+                properties = json.load(f)
+                if properties["id"] == dataset_id:
+                    datasets.append(properties)
+    dataset = datasets[0]
     data_path = dataset["data_path"]
-    files = os.listdir(data_path+"original/")
-    return FileResponse(files[0], filename=files[0])
+    files = os.listdir(data_path+directory)
+    return files
 
 @app.post("/api/dataset/moveExample")
 async def get_dataset_example(dataset_id: str, file: str, type: str):
@@ -191,6 +202,7 @@ async def rename_dataset_labels(dataset_id: str, old_label:str, new_label:str):
     with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
     return {"message": "Label renamed"}
+
 @app.get("/api/dataset/export")
 async def export_dataset(dataset_id: str):
     ds = get_dataset(dataset_id)
@@ -212,3 +224,45 @@ def zipdir(path, ziph):
             ziph.write(os.path.join(root, file),
                        os.path.relpath(os.path.join(root, file),
                                        os.path.join(path, '..')))
+@app.post("/api/dataset/counter/add/")
+async def add_dataset_counter(dataset_id: str, counterName:str):
+    ds = get_dataset(dataset_id)
+    if len(ds) == 0:
+        return {"message": "No dataset found"}
+    dataset = ds[0]
+    if counterName in ds["counter"].keys():
+        ds["counter"][counterName] += 1
+    else:
+        ds["counter"] = {counterName: 1}
+    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+        json.dump(ds, f)
+    return {"message": "Counter added"}
+
+@app.post("/api/dataset/counter/subtract/")
+async def subtract_dataset_counter(dataset_id: str, counterName:str):
+    ds = get_dataset(dataset_id)
+    if len(ds) == 0:
+        return {"message": "No dataset found"}
+    dataset = ds[0]
+    if counterName in ds["counter"].keys():
+        ds["counter"][counterName] -= 1
+    else:
+        return {"message": "No counter found"}
+    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+        json.dump(ds, f)
+    return {"message": "Counter subtracted"}
+
+@app.post("/api/dataset/counter/delete/")
+async def delete_dataset_counter(dataset_id: str, counterName:str):
+    ds = get_dataset(dataset_id)
+    if len(ds) == 0:
+        return {"message": "No dataset found"}
+    dataset = ds[0]
+    if "counter" in ds.keys():
+        ds["counter"].pop(counterName)
+    else:
+        return {"message": "No counter found"}
+    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+        json.dump(ds, f)
+    return {"message": "Counter deleted"}
+
