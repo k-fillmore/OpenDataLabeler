@@ -191,3 +191,24 @@ async def rename_dataset_labels(dataset_id: str, old_label:str, new_label:str):
     with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
     return {"message": "Label renamed"}
+@app.get("/api/dataset/export")
+async def export_dataset(dataset_id: str):
+    ds = get_dataset(dataset_id)
+    if len(ds) == 0:
+        return {"message": "No dataset found"}
+    dataset = ds[0]
+    data_path = dataset["data_path"]
+    dir_list = ["./datasets/"+dataset["name"]+"/train/", "./datasets/"+dataset["name"]+"/valid/", "./datasets/"+dataset["name"]+"/test/"]
+    zipf = zipfile.ZipFile(data_path+"export.zip", 'w', zipfile.ZIP_DEFLATED)
+    for dir in dir_list:
+        zipdir(dir, zipf)
+    zipf.close()
+
+#helper function for export
+def zipdir(path, ziph):
+    # ziph is zipfile handle
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            ziph.write(os.path.join(root, file),
+                       os.path.relpath(os.path.join(root, file),
+                                       os.path.join(path, '..')))
