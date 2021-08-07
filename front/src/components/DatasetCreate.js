@@ -9,16 +9,14 @@ import {
 import Dropzone from "./Dropzone";
 import { v4 as uuid } from "uuid";
 import "./DatasetCreate.css"
+import request from "superagent"
 
 function DatasetCreate() {
   const [datasetId, setDatasetId] = useState(uuid());
   const [datasetName, setDatasetName] = useState("");
   const [datasetType, setDatasetType] = useState("Image");
   const [datasetSubtype, setDatasetSubtype] = useState("Classification");
-  //TODO extract zip file to array or send zip to back end? 
-  const [datasetItems, setDatasetItems] = useState([
-    { path: "test123.img", label: "Yes" },
-  ]);
+  
 
   const datasetTypes = [
     { name: "Image", value: "Image" },
@@ -54,7 +52,29 @@ function DatasetCreate() {
       return <>{generateSubtypeButtons(subtypes)}</>;
     }
   }
-  // function to generate group of radio buttons
+  /*    name: str
+    id: str
+    kind: str
+    problem: str*/
+  function postDataset(){
+    const url = "http://localhost:8000/api/dataset";
+    const formData = {
+      id: datasetId,
+      name: datasetName,
+      kind: datasetType,
+      problem: datasetSubtype,
+    };
+    request.post(url)
+      .send(formData)
+      .end(function(err, res){
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(res.body);
+        }
+      });
+  }
+  
 
   //TODO refactor these into components 
   function generateDatasetButtons(buttonArray) {
@@ -139,12 +159,13 @@ function DatasetCreate() {
           value={datasetName}
           onChange={(e) => setDatasetName(e.target.value)}
         />
+      
       </InputGroup>
       <div>{generateDatasetButtons(datasetTypes)}</div>
       <div>{displayDatasetTypes()}</div>
-      <div className="DatasetCreate"><Dropzone></Dropzone></div>
+      <div className="DatasetCreate"><Dropzone datasetName={datasetName}></Dropzone></div>
       <div className="DatasetCreate centered">
-        <Button  variant="dark">Create</Button>
+        <Button  variant="dark" onClick={e => postDataset()}>Create</Button>
       </div>
     </div>
   );
