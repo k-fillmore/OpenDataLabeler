@@ -1,10 +1,13 @@
 import { React, useState, useEffect } from "react";
-import request from "superagent";
+
 import { Card, Button } from "react-bootstrap";
 import "./DatasetList.css";
+import { useHistory } from "react-router-dom";
+import request from "superagent"
 
 function DatasetList() {
   let [datasets, setDatasets] = useState([]);
+  const history  = useHistory()
   useEffect(
     () =>
       request.get("http://localhost:8000/api/allDatasets").then((data) => {
@@ -13,6 +16,10 @@ function DatasetList() {
       }),
     []
   );
+  function handleClick(dataset) {
+    history.push('/DetailedView',{dataset})
+        
+  }
   function generateCards() {
     return datasets.map((dataset) => {
       return (
@@ -22,7 +29,7 @@ function DatasetList() {
             <Card.Text>
               {dataset.kind + " " + dataset.problem}
             </Card.Text>
-            <Button variant="dark">Label Data</Button>
+            <Button variant="dark" onClick={() => handleClick(dataset)}>Label Data</Button>
           </Card.Body>
         </Card>
       );

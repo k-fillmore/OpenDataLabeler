@@ -1,30 +1,26 @@
 import { React, useState, useEffect } from "react";
 import "./DatasetView.css"
+import { useLocation } from "react-router-dom";
 
 function DatasetView() {
-  const [datasetId, setDatasetId] = useState(0);
-  const [datasetName, setDatasetName] = useState("");
-  const [datasetType, setDatasetType] = useState("");
-  const [datasetSubtype, setDatasetSubtype] = useState("");
-  const [datasetItems, setDatasetItems] = [];
+  const location = useLocation();
+  const dataset = location.state.dataset;
+  const [datasetName, setDatasetName] = useState(dataset.name);
+  const [datasetId, setDatasetId] = useState(dataset.id);
+  const [datasetKind, setDatasetKind] = useState(dataset.kind);
+  const [datasetProblem, setDatasetProblem] = useState(dataset.problem);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-  function loadData() {
-    setDatasetId(0);
-    setDatasetName("TESTNAME");
-    setDatasetType("Image");
-    setDatasetSubtype("Clasification");
-  }
+  
+  
 
+  console.log(dataset); 
   return (
     <div>
       <div className="DatasetDetails">
         <div>ID: {datasetId}</div>
         <div>Name: {datasetName}</div>
-        <div>Type: {datasetType}</div>
-        <div>Problem: {datasetSubtype}</div>
+        <div>Type: {datasetKind}</div>
+        <div>Problem: {datasetProblem}</div>
       </div>
       <div>DatasetTableComponent</div>
     </div>
