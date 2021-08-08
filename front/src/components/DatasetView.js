@@ -75,6 +75,9 @@ function DatasetView() {
           }
         });
         fetchDataset(datasetId);
+        fetchDatasetFiles(datasetId, "original").then((files) => {
+          setDatasetFiles(files);
+        });
     });
   }
   function addLabel(datasetId,label){
@@ -104,14 +107,31 @@ function DatasetView() {
 
   function labelbuttons() {
     if (datasetLabels.length > 0) {
-      console.log(datasetLabels);
       return datasetLabels.map((item) => {
-        return <Button variant="dark">{item}</Button>;
+        return <Button onClick={() => labelImage(datasetFiles[0],item)} variant="dark">{item}</Button>;
       });
     } else{
       return <Button variant="dark" onClick={() => handleShow()}>Press to Add Label</Button>
     }
   }
+
+  function labelImage(file, label) {
+    request
+      .post("http://localhost:8000/api/dataset/moveExample")
+      .query("dataset_id=" + datasetId + "&file=" + file + "&label=" + label)
+      .end((err, res) => {
+        if (err) {
+          console.log(err);
+        } else {
+          fetchDatasetFiles(datasetId, "original").then((files) => {
+            setDatasetFiles(files);
+          });
+          console.log(datasetFiles)
+        }
+      }
+    );
+  }
+
   function managelabels() {
     return (
       <Modal show={show} onHide={handleClose}>
@@ -134,7 +154,6 @@ function DatasetView() {
           <Modal.Footer>
             <Form>
             <Form.Control value={datasetAddLabel}  onChange={(e) => setDatasetAddLabel(e.target.value)} type="text" placeholder="Enter Label" />
-            {console.log(datasetAddLabel)}
             </Form>
             <Button variant="dark" onClick={(event) => addLabel(datasetId,datasetAddLabel)}>Add Label</Button>
           </Modal.Footer>
@@ -143,9 +162,6 @@ function DatasetView() {
     );
   }
 
-  console.log(datasetLabels);
-
-  //console.log(dataset);
   return (
     <div>
       <div className="DatasetDetails">

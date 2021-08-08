@@ -118,12 +118,13 @@ async def get_dataset_list_directory(dataset_id: str, directory: str):
 @app.post("/api/dataset/moveExample")
 async def get_dataset_example(dataset_id: str, file: str, label: str):
     ds = await get_dataset(dataset_id)
-    filestr = re.match(file, "([^\/]+$)").group(0)
+    print(file)
+    filestr = file.split("/")[-1]
+    print(filestr)
     data_path = ds["data_path"]
 
-    shutil.copyfile(file, data_path+"train/"+label+"/"+filestr)
+    shutil.move(file, data_path+"train/"+label+"/"+filestr)
     
-
 @app.post("/api/dataset/moveIncorrectExample")
 async def get_dataset_example(dataset_id: str, file: str, src: str, dest: str):
     ds = get_dataset(dataset_id)
@@ -148,15 +149,18 @@ async def add_dataset_labels(dataset_id: str, label:str):
     ds = await get_dataset(dataset_id)
     if "label" in ds.keys():
         ds["label"].append(label)
+        ds["label"] = sorted(ds["label"])
+        
     else:
         ds["label"] = [label]
     with open("./datasets/"+ds["name"]+"/properties.json", "w") as f:
+        print(ds)
         json.dump(ds, f)
-    for label in ds["label"]:
-        if not os.path.exists("./datasets/"+ds["name"]+"/train/"+label):
-            os.makedirs("./datasets/"+ds["name"]+"/train/"+label)
-            os.makedirs("./datasets/"+ds["name"]+"/valid/"+label)
-            os.makedirs("./datasets/"+ds["name"]+"/test/"+label)
+   
+    if not os.path.exists("./datasets/"+ds["name"]+"/train/"+label):
+        os.makedirs("./datasets/"+ds["name"]+"/data"+"/train/"+label)
+        os.makedirs("./datasets/"+ds["name"]+"/data"+"/valid/"+label)
+        os.makedirs("./datasets/"+ds["name"]+"/data"+"/test/"+label)
     return {"message": "Label added"}
 
 @app.post("/api/dataset/label/delete")
@@ -169,15 +173,15 @@ async def delete_dataset_labels(dataset_id: str, label:str):
     with open("./datasets/"+ds["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
     
-    if os.path.exists("./datasets/"+ds["name"]+"/train/"+label):
-        dir_util.copy_tree("./datasets/"+ds["name"]+"/train/"+label, "./datasets/"+ds["name"]+"/original/")
-        shutil.rmtree("./datasets/"+ds["name"]+"/train/"+label)
-    if os.path.exists("./datasets/"+ds["name"]+"/valid/"+label):
-        dir_util.copy_tree("./datasets/"+ds["name"]+"/valid/"+label, "./datasets/"+ds["name"]+"/original/")
-        shutil.rmtree("./datasets/"+ds["name"]+"/valid/"+label)
-    if os.path.exists("./datasets/"+ds["name"]+"/test/"+label):
-        dir_util.copy_tree("./datasets/"+ds["name"]+"/test/"+label, "./datasets/"+ds["name"]+"/original/")
-        shutil.rmtree("./datasets/"+ds["name"]+"/test/"+label)
+    if os.path.exists("./datasets/"+ds["name"]+"/data"+"/train/"+label):
+        dir_util.copy_tree("./datasets/"+ds["name"]+"/data"+"/train/"+label, "./datasets/"+ds["name"]+"/data"+"/original/")
+        shutil.rmtree("./datasets/"+ds["name"]+"/data"+"/train/"+label)
+    if os.path.exists("./datasets/"+ds["name"]+"/data"+"/valid/"+label):
+        dir_util.copy_tree("./datasets/"+ds["name"]+"/data"+"/valid/"+label, "./datasets/"+ds["name"]+"/data"+"/original/")
+        shutil.rmtree("./datasets/"+ds["name"]+"/data"+"/valid/"+label)
+    if os.path.exists("./datasets/"+ds["name"]+"/data"+"/test/"+label):
+        dir_util.copy_tree("./datasets/"+ds["name"]+"/data"+"/test/"+label, "./datasets/"+ds["name"]+"/data"+"/data"+"/original/")
+        shutil.rmtree("./datasets/"+ds["name"]+"/data"+"/test/"+label)
         
     return {"message": "Label deleted"}
 
