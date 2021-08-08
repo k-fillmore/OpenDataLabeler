@@ -7,7 +7,8 @@ import  json
 from typing import List
 import shutil
 import zipfile
-
+import re
+import distutils.dir_util as dir_util
 
 
 app = FastAPI()
@@ -115,23 +116,13 @@ async def get_dataset_list_directory(dataset_id: str, directory: str):
     return files
 
 @app.post("/api/dataset/moveExample")
-async def get_dataset_example(dataset_id: str, file: str, type: str):
-    ds = get_dataset(dataset_id)
-    if len(ds) == 0:
-        return {"message": "No dataset found"}
-    dataset = ds[0]
-    data_path = dataset["data_path"]
-    if type == "train":
-        shutil.move(data_path+"original/"+file, data_path+"train/"+file)
-        return {"message": "Moved to train"}
-    elif type == "valid":
-        shutil.move(data_path+"original/"+file, data_path+"valid/"+file)
-        return {"message": "Moved to valid"}
-    elif type == "test":
-        shutil.move(data_path+"original/"+file, data_path+"test/"+file)
-        return {"message": "Moved to test"}
-    else:
-        return {"message": "Invalid type"}
+async def get_dataset_example(dataset_id: str, file: str, label: str):
+    ds = await get_dataset(dataset_id)
+    filestr = re.match(file, "([^\/]+$)").group(0)
+    data_path = ds["data_path"]
+
+    shutil.copyfile(file, data_path+"train/"+label+"/"+filestr)
+    
 
 @app.post("/api/dataset/moveIncorrectExample")
 async def get_dataset_example(dataset_id: str, file: str, src: str, dest: str):
@@ -177,16 +168,16 @@ async def delete_dataset_labels(dataset_id: str, label:str):
         return {"message": "No labels found"}
     with open("./datasets/"+ds["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
-    for label in ds["label"]:
-        if os.path.exists("./datasets/"+ds["name"]+"/train/"+label):
-            os.copytree("./datasets/"+ds["name"]+"/train/"+label, "./datasets/"+ds["name"]+"/original/"+label)
-            shutil.rmtree("./datasets/"+ds["name"]+"/train/"+label)
-        if os.path.exists("./datasets/"+ds["name"]+"/valid/"+label):
-            os.copytree("./datasets/"+ds["name"]+"/valid/"+label, "./datasets/"+ds["name"]+"/original/"+label)
-            shutil.rmtree("./datasets/"+ds["name"]+"/valid/"+label)
-        if os.path.exists("./datasets/"+ds["name"]+"/test/"+label):
-            os.copytree("./datasets/"+ds["name"]+"/test/"+label, "./datasets/"+ds["name"]+"/original/"+label)
-            shutil.rmtree("./datasets/"+ds["name"]+"/test/"+label)
+    
+    if os.path.exists("./datasets/"+ds["name"]+"/train/"+label):
+        dir_util.copy_tree("./datasets/"+ds["name"]+"/train/"+label, "./datasets/"+ds["name"]+"/original/")
+        shutil.rmtree("./datasets/"+ds["name"]+"/train/"+label)
+    if os.path.exists("./datasets/"+ds["name"]+"/valid/"+label):
+        dir_util.copy_tree("./datasets/"+ds["name"]+"/valid/"+label, "./datasets/"+ds["name"]+"/original/")
+        shutil.rmtree("./datasets/"+ds["name"]+"/valid/"+label)
+    if os.path.exists("./datasets/"+ds["name"]+"/test/"+label):
+        dir_util.copy_tree("./datasets/"+ds["name"]+"/test/"+label, "./datasets/"+ds["name"]+"/original/")
+        shutil.rmtree("./datasets/"+ds["name"]+"/test/"+label)
         
     return {"message": "Label deleted"}
 
@@ -234,7 +225,7 @@ async def export_dataset(dataset_id: str):
 #helper function for export
 def zipdir(path, ziph):
     # ziph is zipfile handle
-    for root, dirs, files in os.walk(path):
+    for root, files in os.walk(path):
         for file in files:
             ziph.write(os.path.join(root, file),
                        os.path.relpath(os.path.join(root, file),
