@@ -199,8 +199,14 @@ async def rename_dataset_labels(dataset_id: str, old_label:str, new_label:str):
                 ds["label"][i] = new_label
     else:
         return {"message": "No labels found"}
-    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+    with open("./datasets/"+ds["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
+    if os.path.exists("./datasets/"+ds["name"]+"/train/"+old_label):
+        os.rename("./datasets/"+ds["name"]+"/train/"+old_label, "./datasets/"+ds["name"]+"/train/"+new_label)
+    if os.path.exists("./datasets/"+ds["name"]+"/valid/"+old_label):
+        os.rename("./datasets/"+ds["name"]+"/valid/"+old_label, "./datasets/"+ds["name"]+"/valid/"+new_label)
+    if os.path.exists("./datasets/"+ds["name"]+"/test/"+old_label):
+        os.rename("./datasets/"+ds["name"]+"/test/"+old_label, "./datasets/"+ds["name"]+"/test/"+new_label)
     return {"message": "Label renamed"}
 
 @app.get ("/api/label/all")
