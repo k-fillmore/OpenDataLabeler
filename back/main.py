@@ -161,6 +161,11 @@ async def add_dataset_labels(dataset_id: str, label:str):
         ds["label"] = [label]
     with open("./datasets/"+ds["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
+    for label in ds["label"]:
+        if not os.path.exists("./datasets/"+ds["name"]+"/train/"+label):
+            os.makedirs("./datasets/"+ds["name"]+"/train/"+label)
+            os.makedirs("./datasets/"+ds["name"]+"/valid/"+label)
+            os.makedirs("./datasets/"+ds["name"]+"/test/"+label)
     return {"message": "Label added"}
 
 @app.post("/api/dataset/label/delete")
@@ -172,6 +177,17 @@ async def delete_dataset_labels(dataset_id: str, label:str):
         return {"message": "No labels found"}
     with open("./datasets/"+ds["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
+    for label in ds["label"]:
+        if os.path.exists("./datasets/"+ds["name"]+"/train/"+label):
+            os.copytree("./datasets/"+ds["name"]+"/train/"+label, "./datasets/"+ds["name"]+"/original/"+label)
+            shutil.rmtree("./datasets/"+ds["name"]+"/train/"+label)
+        if os.path.exists("./datasets/"+ds["name"]+"/valid/"+label):
+            os.copytree("./datasets/"+ds["name"]+"/valid/"+label, "./datasets/"+ds["name"]+"/original/"+label)
+            shutil.rmtree("./datasets/"+ds["name"]+"/valid/"+label)
+        if os.path.exists("./datasets/"+ds["name"]+"/test/"+label):
+            os.copytree("./datasets/"+ds["name"]+"/test/"+label, "./datasets/"+ds["name"]+"/original/"+label)
+            shutil.rmtree("./datasets/"+ds["name"]+"/test/"+label)
+        
     return {"message": "Label deleted"}
 
 @app.post("/api/dataset/label/rename")
@@ -217,45 +233,37 @@ def zipdir(path, ziph):
             ziph.write(os.path.join(root, file),
                        os.path.relpath(os.path.join(root, file),
                                        os.path.join(path, '..')))
+
 @app.post("/api/dataset/counter/add/")
 async def add_dataset_counter(dataset_id: str, counterName:str):
-    ds = get_dataset(dataset_id)
-    if len(ds) == 0:
-        return {"message": "No dataset found"}
-    dataset = ds[0]
+    ds = await get_dataset(dataset_id)
     if counterName in ds["counter"].keys():
         ds["counter"][counterName] += 1
     else:
         ds["counter"] = {counterName: 1}
-    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+    with open("./datasets/"+ds["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
     return {"message": "Counter added"}
 
 @app.post("/api/dataset/counter/subtract/")
 async def subtract_dataset_counter(dataset_id: str, counterName:str):
-    ds = get_dataset(dataset_id)
-    if len(ds) == 0:
-        return {"message": "No dataset found"}
-    dataset = ds[0]
+    ds = await get_dataset(dataset_id)
     if counterName in ds["counter"].keys():
         ds["counter"][counterName] -= 1
     else:
         return {"message": "No counter found"}
-    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+    with open("./datasets/"+ds["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
     return {"message": "Counter subtracted"}
 
 @app.post("/api/dataset/counter/delete/")
 async def delete_dataset_counter(dataset_id: str, counterName:str):
-    ds = get_dataset(dataset_id)
-    if len(ds) == 0:
-        return {"message": "No dataset found"}
-    dataset = ds[0]
+    ds = await  get_dataset(dataset_id)
     if "counter" in ds.keys():
         ds["counter"].pop(counterName)
     else:
         return {"message": "No counter found"}
-    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+    with open("./datasets/"+ds["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
     return {"message": "Counter deleted"}
 
