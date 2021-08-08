@@ -14,6 +14,7 @@ function DatasetView() {
   const [datasetFiles, setDatasetFiles] = useState([]);
   const [datasetLabels, setDatasetLabels] = useState(dataset.label);
   const [show, setShow] = useState(false);
+  const [datasetAddLabel, setDatasetAddLabel] = useState("");
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -61,6 +62,38 @@ function DatasetView() {
     });
   }
 
+  function removeLabel(datasetId,label){
+    return new Promise((resolve, reject) => {
+      request
+        .post("http://localhost:8000/api/dataset/label/delete")
+        .query("dataset_id=" + datasetId + "&label=" + label)
+        .end((err, res) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(res.body);
+          }
+        });
+        fetchDataset(datasetId);
+    });
+  }
+  function addLabel(datasetId,label){
+    return new Promise((resolve, reject) => {
+      request
+        .post("http://localhost:8000/api/dataset/label/add")
+        .query("dataset_id=" + datasetId + "&label=" + label)
+        .end((err, res) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(res.body);
+          }
+        });
+        fetchDataset(datasetId);
+        setDatasetAddLabel("")
+    });
+  }
+
   function getImageToLabel(file) {
     if (file == null) {
       return null;
@@ -92,7 +125,7 @@ function DatasetView() {
               return (
                 <div key={item}>
                   {item} 
-                  <Button variant="dark" key={item}>Remove</Button>
+                  <Button variant="dark" key={item}onClick={() => removeLabel(datasetId,item)}>Remove</Button>
                 </div>
                 );
             })}
@@ -100,9 +133,10 @@ function DatasetView() {
 
           <Modal.Footer>
             <Form>
-            <Form.Control type="text" placeholder="Enter Label" />
+            <Form.Control value={datasetAddLabel}  onChange={(e) => setDatasetAddLabel(e.target.value)} type="text" placeholder="Enter Label" />
+            {console.log(datasetAddLabel)}
             </Form>
-            <Button variant="dark">Add Label</Button>
+            <Button variant="dark" onClick={(event) => addLabel(datasetId,datasetAddLabel)}>Add Label</Button>
           </Modal.Footer>
         </Modal.Dialog>
       </Modal>

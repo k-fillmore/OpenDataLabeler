@@ -154,38 +154,29 @@ async def get_dataset_example(dataset_id: str, file: str, src: str, dest: str):
 
 @app.post("/api/dataset/label/add")
 async def add_dataset_labels(dataset_id: str, label:str):
-    ds = get_dataset(dataset_id)
-    if len(ds) == 0:
-        return {"message": "No dataset found"}
-    dataset = ds[0]
+    ds = await get_dataset(dataset_id)
     if "label" in ds.keys():
         ds["label"].append(label)
     else:
         ds["label"] = [label]
-    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+    with open("./datasets/"+ds["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
     return {"message": "Label added"}
 
 @app.post("/api/dataset/label/delete")
 async def delete_dataset_labels(dataset_id: str, label:str):
-    ds = get_dataset(dataset_id)
-    if len(ds) == 0:
-        return {"message": "No dataset found"}
-    dataset = ds[0]
+    ds = await get_dataset(dataset_id)
     if "label" in ds.keys():
         ds["label"].remove(label)
     else:
         return {"message": "No labels found"}
-    with open("./datasets/"+dataset["name"]+"/properties.json", "w") as f:
+    with open("./datasets/"+ds["name"]+"/properties.json", "w") as f:
         json.dump(ds, f)
     return {"message": "Label deleted"}
 
 @app.post("/api/dataset/label/rename")
 async def rename_dataset_labels(dataset_id: str, old_label:str, new_label:str):
-    ds = get_dataset(dataset_id)
-    if len(ds) == 0:
-        return {"message": "No dataset found"}
-    dataset = ds[0]
+    ds = await get_dataset(dataset_id)
     if "label" in ds.keys():
         for i, label in enumerate(ds["label"]):
             if label == old_label:
