@@ -98,27 +98,20 @@ async def get_dataset(dataset_id: str):
             with open("./datasets/"+dataset+"/properties.json", "r") as f:
                 properties = json.load(f)
                 if properties["id"] == dataset_id:
-                    datasets.append(properties)
-    return datasets
+                    return (properties)
+    return { "message": "dataset not found" }
 
 @app.get("/api/dataset/fetchExample")
 async def get_dataset_example(file:str):
-    return FileResponse(file, file_name=file)
+    return FileResponse(file)
 
 @app.get("/api/dataset/listdirectory")
 async def get_dataset_list_directory(dataset_id: str, directory: str):
-    datasets = []
-    for dataset in os.listdir("./datasets/"):
-        if dataset == "temp":
-            continue
-        if os.path.isdir("./datasets/"+dataset):
-            with open("./datasets/"+dataset+"/properties.json", "r") as f:
-                properties = json.load(f)
-                if properties["id"] == dataset_id:
-                    datasets.append(properties)
-    dataset = datasets[0]
+    dataset = await get_dataset(dataset_id)
     data_path = dataset["data_path"]
     files = os.listdir(data_path+directory)
+    for i, file in enumerate(files):
+        files[i] = os.path.join(data_path+directory, file)
     return files
 
 @app.post("/api/dataset/moveExample")
@@ -203,6 +196,15 @@ async def rename_dataset_labels(dataset_id: str, old_label:str, new_label:str):
         json.dump(ds, f)
     return {"message": "Label renamed"}
 
+@app.get ("/api/label/all")
+async def get_all_labels(dataset_id: str):
+    ds = get_dataset(dataset_id)
+    if "label" in ds.keys():
+        return ds["label"]
+    else:
+        return {"message": "No labels found"}
+    
+    
 @app.get("/api/dataset/export")
 async def export_dataset(dataset_id: str):
     ds = get_dataset(dataset_id)
