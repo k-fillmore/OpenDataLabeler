@@ -1,11 +1,29 @@
 .DatasetDetails
 {
-    border-top: 3px solid lightgray;
+
     border-radius: 5px;
     width: 20%;
+    float: left;
+    margin: 2rem;
+    background-color: #343a40;
+    color:white;
+
 }
 .DatasetDetails div{
-    border-bottom: 3px solid lightgray;
-    margin: 5px; 
+    margin: 5px auto;
+    padding-left: 0.5rem; 
     width: 100%;
+}
+.labeling {
+    margin: 10 auto; width: 656px;text-align:center;
+    float: left;
+    color: white;
+    border: 2px solid lightgray;
+    border-radius: 10px;
+    background: #343a40;
+}
+.labeling button{
+    margin: 0.2rem;
+     width: 5rem;
+      text-align: center;
 }

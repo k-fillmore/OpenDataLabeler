@@ -169,15 +169,19 @@ function DatasetView() {
         <div>Name: {datasetName}</div>
         <div>Type: {datasetKind}</div>
         <div>Problem: {datasetProblem}</div>
-      </div>
-      <img src={getImageToLabel(datasetFiles[0])}></img>
-      <div>{labelbuttons()}</div>
-      <div>
+        <div>
         {managelabels()}
         <Button variant="dark" onClick={() => handleShow()}>
           Manage Labels
         </Button>
       </div>
+      </div>
+      <div className="labeling">
+        <h2>Item to Label</h2>
+      <img src={getImageToLabel(datasetFiles[0])}></img>
+      <div>{labelbuttons()}</div>
+      </div>
+      
     </div>
   );
 }
