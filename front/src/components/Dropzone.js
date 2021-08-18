@@ -6,7 +6,7 @@ import request from 'superagent';
 
 
 function Dropzone(props) {
-  const datasetName = props.datasetName;
+  let datasetName = props.dName;
   
     
   const onDrop = useCallback((acceptedFiles) => {
