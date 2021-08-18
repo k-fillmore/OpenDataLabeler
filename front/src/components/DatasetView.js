@@ -50,7 +50,7 @@ function DatasetView() {
   function fetchDatasetFiles(datasetId, directory) {
     return new Promise((resolve, reject) => {
       request
-        .get("http://localhost:8000/api/dataset/listdirectory")
+        .get("http://localhost:8000/api/image/classification/listdirectory")
         .query("dataset_id=" + datasetId + "&directory=" + directory)
         .end((err, res) => {
           if (err) {
@@ -101,7 +101,7 @@ function DatasetView() {
     if (file == null) {
       return null;
     }
-    const uri = "http://localhost:8000/api/dataset/fetchExample?file=" + file;
+    const uri = "http://localhost:8000/api/image/classification/fetchExample?file=" + file;
     return uri;
   }
 
@@ -117,7 +117,7 @@ function DatasetView() {
 
   function labelImage(file, label) {
     request
-      .post("http://localhost:8000/api/dataset/moveExample")
+      .post("http://localhost:8000/api/image/classification/moveExample")
       .query("dataset_id=" + datasetId + "&file=" + file + "&label=" + label)
       .end((err, res) => {
         if (err) {
