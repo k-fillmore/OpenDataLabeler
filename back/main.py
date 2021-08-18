@@ -7,7 +7,6 @@ import  json
 from typing import List
 import shutil
 import zipfile
-import re
 import distutils.dir_util as dir_util
 
 
@@ -35,18 +34,9 @@ class Dataset(BaseModel):
     count: dict = {"Original":0, "train":0, "test":0, "valid":0}
 
 
-@app.get("/")
-async def root():
-    return {"message": "World"}
-
-@app.post("/api/upload/images/")
-async def upload_image( datasetName: str, images: List[UploadFile] = File(...)):
-    print(images, datasetName)
-    dirpath = "./datasets/"+datasetName+"/data/"
-    for image in images:
-        with open("./datasets/temp/"+datasetName+".zip", "wb") as buffer:
-            shutil.copyfileobj(image.file, buffer)
-        
+#
+#   Universal Dataset Routes
+#    
 
 @app.post("/api/dataset")
 async def create_dataset(dataset: Dataset):
@@ -101,48 +91,6 @@ async def get_dataset(dataset_id: str):
                 if properties["id"] == dataset_id:
                     return (properties)
     return { "message": "dataset not found" }
-
-@app.get("/api/dataset/fetchExample")
-async def get_dataset_example(file:str):
-    return FileResponse(file)
-
-@app.get("/api/dataset/listdirectory")
-async def get_dataset_list_directory(dataset_id: str, directory: str):
-    dataset = await get_dataset(dataset_id)
-    data_path = dataset["data_path"]
-    files = os.listdir(data_path+directory)
-    for i, file in enumerate(files):
-        files[i] = os.path.join(data_path+directory, file)
-    return files
-
-@app.post("/api/dataset/moveExample")
-async def get_dataset_example(dataset_id: str, file: str, label: str):
-    ds = await get_dataset(dataset_id)
-    print(file)
-    filestr = file.split("/")[-1]
-    print(filestr)
-    data_path = ds["data_path"]
-
-    shutil.move(file, data_path+"train/"+label+"/"+filestr)
-    
-@app.post("/api/dataset/moveIncorrectExample")
-async def get_dataset_example(dataset_id: str, file: str, src: str, dest: str):
-    ds = get_dataset(dataset_id)
-    if len(ds) == 0:
-        return {"message": "No dataset found"}
-    dataset = ds[0]
-    data_path = dataset["data_path"]
-    if src == "train":
-        shutil.move(data_path+"train/"+file, data_path+dest+"/"+file)
-        return {"message": "Moved to {dest}"}
-    elif src == "valid":
-        shutil.move(data_path+"valid/"+file, data_path+dest+"/"+file)
-        return {"message": "Moved to {dest}"}
-    elif src == "test":
-        shutil.move(data_path+"test/"+file, data_path+dest+"/"+file)
-        return {"message": "Moved to {dest}"}
-    else:
-        return {"message": "Invalid type"}
 
 @app.post("/api/dataset/label/add")
 async def add_dataset_labels(dataset_id: str, label:str):
@@ -268,3 +216,56 @@ async def delete_dataset_counter(dataset_id: str, counterName:str):
         json.dump(ds, f)
     return {"message": "Counter deleted"}
 
+#
+#   Image Classification Routes
+#
+
+@app.post("/api/image/classification/upload/")
+async def upload_image( datasetName: str, images: List[UploadFile] = File(...)):
+    print(images, datasetName)
+    dirpath = "./datasets/"+datasetName+"/data/"
+    for image in images:
+        with open("./datasets/temp/"+datasetName+".zip", "wb") as buffer:
+            shutil.copyfileobj(image.file, buffer)
+            
+@app.get("/api/image/classification/fetchExample")
+async def get_dataset_example(file:str):
+    return FileResponse(file)
+
+@app.get("/api/image/classification/listdirectory")
+async def get_dataset_list_directory(dataset_id: str, directory: str):
+    dataset = await get_dataset(dataset_id)
+    data_path = dataset["data_path"]
+    files = os.listdir(data_path+directory)
+    for i, file in enumerate(files):
+        files[i] = os.path.join(data_path+directory, file)
+    return files
+
+@app.post("/api/image/classification/moveExample")
+async def get_dataset_example(dataset_id: str, file: str, label: str):
+    ds = await get_dataset(dataset_id)
+    print(file)
+    filestr = file.split("/")[-1]
+    print(filestr)
+    data_path = ds["data_path"]
+
+    shutil.move(file, data_path+"train/"+label+"/"+filestr)
+    
+@app.post("/api/image/classification/moveIncorrectExample")
+async def get_dataset_example(dataset_id: str, file: str, src: str, dest: str):
+    ds = get_dataset(dataset_id)
+    if len(ds) == 0:
+        return {"message": "No dataset found"}
+    dataset = ds[0]
+    data_path = dataset["data_path"]
+    if src == "train":
+        shutil.move(data_path+"train/"+file, data_path+dest+"/"+file)
+        return {"message": "Moved to {dest}"}
+    elif src == "valid":
+        shutil.move(data_path+"valid/"+file, data_path+dest+"/"+file)
+        return {"message": "Moved to {dest}"}
+    elif src == "test":
+        shutil.move(data_path+"test/"+file, data_path+dest+"/"+file)
+        return {"message": "Moved to {dest}"}
+    else:
+        return {"message": "Invalid type"}
